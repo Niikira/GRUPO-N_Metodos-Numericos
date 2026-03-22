@@ -75,5 +75,7 @@ for x1, fx in zip(dadosX, dadosFX):
     print(f"{x1} | {round(fx, numeroDeCasasDecimais)}")
 
 print(stringGigante)
-erro_arredondamento(numeroDeTrapeziosParam=numeroDeTrapezios, numeroDeCasasDecimaisParam=numeroDeCasasDecimais,passoParam=passo)
-
+erroArredondamento = erro_arredondamento(numeroDeTrapeziosParam=numeroDeTrapezios, numeroDeCasasDecimaisParam=numeroDeCasasDecimais,passoParam=passo)
+print(f"|Ea| <= {erroArredondamento}")
+print(f"{expressao} pertence ao intervalo: ({round(totalArea,numeroDeCasasDecimais)} +/- {erroArredondamento})")
+print(f"ou [{round(totalArea-erroArredondamento,numeroDeCasasDecimais)} ; {round(erroArredondamento+totalArea,numeroDeCasasDecimais)}]")
