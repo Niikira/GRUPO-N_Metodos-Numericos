@@ -1,8 +1,8 @@
 #Bibliotecas
-import numpy as np
 import sympy as sp
 import pandas as pd
 from sympy import symbols, sympify
+from decimal import getcontext, ROUND_HALF_UP
 
 #notas para o próximo dev:
 
@@ -23,8 +23,10 @@ from sympy import symbols, sympify
 
 #Niikira:
 #descarte da função "area_trapezio" pois não será mais necessária (comentada)
-#construção da tabela (x  f(x))
+#definição do tipo de arredondamento
+#construção da tabela (x  f(x)) com o arredondamento especificado
 #calculo aproximado da integral
+#calculo do erro de arredondamento da integral
 
 
 # Entrada de dados
@@ -40,33 +42,36 @@ print(numeroDeCasasDecimais)
 #print(passo)
 # Definições de métodos
 
-"""
-    Precisa: Calcular a base menor, calcular a base maior, a altura antes de chamar esse método
-
-def area_trapezio(baseMenor, baseMaior, altura):
-    areaTrapezio = ((baseMaior + baseMenor)*altura)/2 
-    
-    return areaTrapezio
-"""
-
 def erro_arredondamento(numeroDeTrapezios, numeroDeCasasDecimais, passo): 
     ErroArredondamento = numeroDeTrapezios * ((10 ** (-numeroDeCasasDecimais))/2) * passo 
     print(ErroArredondamento)
     return ErroArredondamento
 
+def erro_truncamento(passo, funcao, inicio, fim, numeroDeCasasDecimais):
+    intervalo = sp.Interval(inicio, fim)
+    segundaDerivada = sp.diff(funcao, x, 2)
+    max = sp.maximum(abs(segundaDerivada), intervalo)
+    Etru = round(((passo**3)/12 * max), numeroDeCasasDecimais)
+    print(Etru)
+    return Etru
+
 #cálculo da integral
+getcontext.rounding = ROUND_HALF_UP #definição do tipo de arredondamento
 x = symbols('x') #define x como variavel
+expressao_corrigida = expressao.replace("r(", "sqrt(")
 func = sympify(expressao) #conversão da string de entrada para função matemática
 print(func)
-inicio = int(intervalo[0])
-fim = int(intervalo[1])
+inicio = float(intervalo[0])
+fim = float(intervalo[1])
 passo = (fim-inicio)/numeroDeTrapezios
 dados = {"x": [], "f(x)": []}
-
 #loop de preenchimento da tabela "x  f(x)"
-for i in range(inicio, fim+1, passo):
+i: float #contador para o loop
+i = inicio
+while(i <= fim):
     dados["x"].append(i)
-    dados["f(x)"].append(func.subs(x, i))
+    dados["f(x)"].append(round(func.subs(x, i), numeroDeCasasDecimais))
+    i = i + passo
 #criacao da tabela
 tabela = pd.DataFrame(dados)
 #cópia da coluna "f(x)" para calculo da integral
@@ -75,5 +80,7 @@ colunafx = tabela["f(x)"].copy()
 colunafx.iloc[0] = colunafx.iloc[0]/2
 colunafx.iloc[-1] = colunafx.iloc[-1]/2
 #somatória das areas
-integral = colunafx.sum()
-
+integral = colunafx.sum() * passo
+Ea = erro_arredondamento(numeroDeTrapezios, numeroDeCasasDecimais, passo)
+Etru = erro_truncamento(passo, func, inicio, fim, numeroDeCasasDecimais)
+erroTotal = abs(Ea) + abs(Etru)
