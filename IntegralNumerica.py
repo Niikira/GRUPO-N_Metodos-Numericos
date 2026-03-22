@@ -79,6 +79,9 @@ colunafx.iloc[0] = colunafx.iloc[0]/2
 colunafx.iloc[-1] = colunafx.iloc[-1]/2
 #somatória das areas
 integral = colunafx.sum() * passo
+#calculo do intervalo da integral real
 Ea = erro_arredondamento(numeroDeTrapezios, numeroDeCasasDecimais, passo)
 Etru = erro_truncamento(passo, func, inicio, fim, numeroDeCasasDecimais)
 erroTotal = abs(Ea) + abs(Etru)
+IntegralMin = integral - erroTotal
+IntegralMax = integral + erroTotal
