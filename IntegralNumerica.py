@@ -7,9 +7,7 @@ from decimal import getcontext, ROUND_HALF_UP
 #notas para o próximo dev:
 
 #a ser feito:
-#lógica de cálculo de integral com loop de somatória
 #todas as saídas especificadas
-#erro de truncamento (se der tempo)
 
 #Niikira: 
 #Entendi que as entradas podem ser:
