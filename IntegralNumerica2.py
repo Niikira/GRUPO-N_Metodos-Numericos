@@ -1,6 +1,8 @@
 
 
-# Entrada de dados
+# Bibliotecas
+import sympy as sp
+from numpy import double
 from decimal import ROUND_HALF_UP, getcontext
 from sympy import symbols, sympify
 
@@ -15,18 +17,14 @@ numeroDeCasasDecimais = int(input("Quantas casas decimais você gostaria? "))
 
 
 # Tratamento de dados
-inicio = float(intervalo[0])
-fim = float(intervalo[1])
+inicio = double(intervalo[0])
+fim = double(intervalo[1])
 passo = (fim-inicio)/numeroDeTrapezios
 
-
-
 x = symbols('x') #define x como variavel
-func = sympify(expressao) #conversão da string de entrada para função matemática
+func = sympify(expressao.replace("r(", "sqrt(")) #conversão da string de entrada para função matemática
 
-
-
-firstFX = func.subs(x, inicio)
+firstFX = double(func.subs(x, inicio).evalf())
 dadosX = [inicio]
 dadosFX = [firstFX]
 
@@ -37,7 +35,6 @@ iii=-1
 
 def erro_arredondamento(numeroDeTrapeziosParam, numeroDeCasasDecimaisParam, passoParam): 
     ErroArredondamento = numeroDeTrapeziosParam * ((10 ** (-numeroDeCasasDecimaisParam))/2) * passoParam 
-    print(ErroArredondamento)
     return ErroArredondamento
 
 #loop de preenchimento da tabela "x  f(x)"
@@ -46,12 +43,12 @@ while i < fim:
     ii = ii+1
     value = dadosX[ii-1] + passo
     dadosX.append(value)
-    dadosFX.append(func.subs(x, value))
+    dadosFX.append(double(func.subs(x, value).evalf()))
 
 
-firstPart = dadosFX[0]/2
-lastPart = dadosFX[numeroDeTrapezios]/2
-anotherParts = 0
+firstPart = double(dadosFX[0]/2)
+lastPart = double(dadosFX[numeroDeTrapezios]/2)
+anotherParts = double(0.0)
 
 # define a somatória que será efetuada ao final
 stringGigante = str(passo) + "*(" + str(round(firstPart, numeroDeCasasDecimais)) + " + "
@@ -65,17 +62,17 @@ for i in range(1, numeroDeTrapezios, 1):
 totalArea = passo * (firstPart+anotherParts+lastPart)
 stringGigante = stringGigante + str(round(lastPart, numeroDeCasasDecimais)) + ")=" + str(round(totalArea, numeroDeCasasDecimais))
 
-print(func)
+print(f"função: {expressao}")
 
 #criacao da tabela
 print("=================")
 print("x | f(x)")
 for x1, fx in zip(dadosX, dadosFX):
     iii = iii+1
-    print(f"{x1} | {round(fx, numeroDeCasasDecimais)}")
+    print(f"{x1} | {round(double(fx), numeroDeCasasDecimais)}")
 
-print(stringGigante)
-erroArredondamento = erro_arredondamento(numeroDeTrapeziosParam=numeroDeTrapezios, numeroDeCasasDecimaisParam=numeroDeCasasDecimais,passoParam=passo)
+print(f"Soma das áreas dos trapézios: {stringGigante}")
+erroArredondamento = abs(erro_arredondamento(numeroDeTrapeziosParam=numeroDeTrapezios, numeroDeCasasDecimaisParam=numeroDeCasasDecimais,passoParam=passo))
 print(f"|Ea| <= {erroArredondamento}")
 print(f"{expressao} pertence ao intervalo: ({round(totalArea,numeroDeCasasDecimais)} +/- {erroArredondamento})")
 print(f"ou [{round(totalArea-erroArredondamento,numeroDeCasasDecimais)} ; {round(erroArredondamento+totalArea,numeroDeCasasDecimais)}]")
